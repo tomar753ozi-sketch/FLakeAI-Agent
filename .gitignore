@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# FlakeAI
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+tokenizer.json
+*.log
+
+# Data
+data/
+*.txt
+*.json
+!requirements.txt
+!configs/*.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Distribution
+dist/*.deb
+dist/*.exe
+dist/*.msi
