@@ -9,9 +9,8 @@ class handler(BaseHTTPRequestHandler):
         
         message = data.get('message', '')
         
-        # Basit yanıt (model henüz yok)
         response = {
-            "response": f"FlakeAI: {message} - Merhaba! Ben FlakeAI Agent. Yakında daha akıllı olacağım!"
+            "response": f"FlakeAI: {message}"
         }
         
         self.send_response(200)
@@ -26,3 +25,12 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
+    
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        
+        with open('index.html', 'r') as f:
+            html = f.read()
+        self.wfile.write(html.encode())
