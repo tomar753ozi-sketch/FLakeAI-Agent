@@ -19,14 +19,11 @@ err() { echo -e "${RED}[HATA]${NC} $1"; exit 1; }
 install_deps() {
     log "Bağımlılıklar kuruluyor..."
     
-    # Sistem paketleri
     sudo pacman -S --needed --noconfirm python python-pip git base-devel
     
-    # Virtual environment oluştur
     log "Virtual environment oluşturuluyor..."
     python -m venv "$VENV_DIR"
     
-    # Paketleri venv'e kur
     log "Python paketleri kuruluyor..."
     source "$VENV_DIR/bin/activate"
     
@@ -45,7 +42,6 @@ install_flakeai() {
     mkdir -p "$INSTALL_DIR"
     mkdir -p "$BIN_DIR"
     
-    # Dosyaları kopyala
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     cp -r "$SCRIPT_DIR"/* "$INSTALL_DIR/"
     
@@ -59,23 +55,21 @@ deactivate
 EOF
     chmod +x "$BIN_DIR/flakeai"
     
-    # GUI komutu
+    # GUI launcher
     cat > "$BIN_DIR/flakeai-gui" << EOF
 #!/bin/bash
 source "$VENV_DIR/bin/activate"
 cd "$INSTALL_DIR"
 python main.py --mode gui "\$@"
-deactivate
 EOF
     chmod +x "$BIN_DIR/flakeai-gui"
     
-    # Web komutu
+    # Web launcher
     cat > "$BIN_DIR/flakeai-web" << EOF
 #!/bin/bash
 source "$VENV_DIR/bin/activate"
 cd "$INSTALL_DIR"
 python main.py --mode web "\$@"
-deactivate
 EOF
     chmod +x "$BIN_DIR/flakeai-web"
     
@@ -92,20 +86,32 @@ setup_path() {
 }
 
 create_desktop_entry() {
-    log "Desktop entry oluşturuluyor..."
+    log "Uygulama ikonu oluşturuluyor..."
     
     mkdir -p "$HOME/.local/share/applications"
+    mkdir -p "$HOME/.local/share/icons/hicolor/256x256/apps"
     
+    # Desktop entry
     cat > "$HOME/.local/share/applications/flakeai.desktop" << EOF
 [Desktop Entry]
 Name=FlakeAI
+GenericName=AI Assistant
 Comment=Sıfırdan eğitilen AI modeli
 Exec=$BIN_DIR/flakeai-gui
-Icon=flakeai
+Icon=python
 Terminal=false
 Type=Application
-Categories=Development;AI;
+Categories=Development;Utility;
+Keywords=ai;assistant;
+StartupWMClass=flakeai
 EOF
+    
+    chmod +x "$HOME/.local/share/applications/flakeai.desktop"
+    
+    # Desktop database güncelle
+    update-desktop-database ~/.local/share/applications/ 2>/dev/null || true
+    
+    log "Uygulama menüye eklendi!"
 }
 
 main() {
@@ -125,10 +131,9 @@ main() {
     echo "    Kurulum Tamamlandı!"
     echo "═══════════════════════════════════════"
     echo ""
-    echo "Kullanım:"
-    echo "  flakeai 'Hello world'        # Terminal"
-    echo "  flakeai-gui                   # Masaüstü"
-    echo "  flakeai-web                   # Web arayüzü"
+    echo "Uygulamayı açmak için:"
+    echo "  - Uygulama menüsünden 'FlakeAI' ara"
+    echo "  - Veya terminalden: flakeai-gui"
     echo ""
 }
 
