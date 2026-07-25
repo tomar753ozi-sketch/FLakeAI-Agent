@@ -20,18 +20,18 @@ err() { echo -e "${RED}[HATA]${NC} $1"; exit 1; }
 install_deps() {
     log "Bağımlılıklar kuruluyor..."
     
-    # Python 3.11 kur (eğer yoksa)
-    if ! command -v python3.11 &> /dev/null; then
-        warn "Python 3.11 kurulu değil, kuruluyor..."
-        sudo pacman -S --needed --noconfirm python311 python311-pip
+    # Python kur (eğer yoksa)
+    if ! command -v python &> /dev/null; then
+        warn "Python kurulu değil, kuruluyor..."
+        sudo pacman -S --needed --noconfirm python python-pip
     fi
     
     # Python paketleri
-    pip3.11 install --user --upgrade pip
-    pip3.11 install --user torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-    pip3.11 install --user transformers datasets accelerate peft
-    pip3.11 install --user flask fastapi uvicorn
-    pip3.11 install --user pyqt6 pillow numpy tqdm pyyaml requests sentencepiece protobuf
+    pip install --user --upgrade pip
+    pip install --user torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+    pip install --user transformers datasets accelerate peft
+    pip install --user flask fastapi uvicorn
+    pip install --user pyqt6 pillow numpy tqdm pyyaml requests sentencepiece protobuf
 }
 
 # FlakeAI'ı kur
@@ -49,21 +49,24 @@ install_flakeai() {
     # Ana komut
     cat > "$BIN_DIR/flakeai" << 'EOF'
 #!/bin/bash
-python3.11 -m inference.engine "$@"
+cd ~/.local/share/flakeai
+python main.py "$@"
 EOF
     chmod +x "$BIN_DIR/flakeai"
     
     # GUI komutu
     cat > "$BIN_DIR/flakeai-gui" << 'EOF'
 #!/bin/bash
-python3.11 -m app.desktop.main "$@"
+cd ~/.local/share/flakeai
+python main.py --mode gui "$@"
 EOF
     chmod +x "$BIN_DIR/flakeai-gui"
     
     # Web komutu
     cat > "$BIN_DIR/flakeai-web" << 'EOF'
 #!/bin/bash
-python3.11 -m app.web.server "$@"
+cd ~/.local/share/flakeai
+python main.py --mode web "$@"
 EOF
     chmod +x "$BIN_DIR/flakeai-web"
     
@@ -118,10 +121,6 @@ main() {
     echo "  flakeai 'Hello world'        # Terminal"
     echo "  flakeai-gui                   # Masaüstü"
     echo "  flakeai-web                   # Web arayüzü"
-    echo ""
-    echo "Örnek:"
-    echo "  flakeai 'Write a sorting algorithm'"
-    echo "  flakeai --image photo.jpg 'What is this?'"
     echo ""
 }
 

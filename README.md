@@ -1,64 +1,80 @@
-# FlakeAI - Sıfırdan Eğitilen AI Modeli
+# FlakeAI Agent
 
-**400-700M parametre, CPU-optimized, kendi AI modeliniz**
+**Sıfırdan eğitilen AI modeli - 400-700M parametre**
+
+## İndir
+
+| Platform | Link | Boyut |
+|----------|------|-------|
+| **Windows (.exe)** | [FlakeAI-Setup.exe](https://github.com/tomar753ozi-sketch/FlakeAI-Agent/releases/download/v1.0/FlakeAI-Setup.exe) | ~50MB |
+| **Debian/Ubuntu (.deb)** | [flakeai_1.0_amd64.deb](https://github.com/tomar753ozi-sketch/FlakeAI-Agent/releases/download/v1.0/flakeai_1.0_amd64.deb) | ~50MB |
+| **Arch Linux** | `git clone` + kurulum | - |
+| **Kaynak Kod** | [FlakeAI-Agent.zip](https://github.com/tomar753ozi-sketch/FlakeAI-Agent/archive/refs/heads/main.zip) | ~20KB |
 
 ## Özellikler
 - Sıfırdan eğitilmiş Transformer modeli
-- Kod yazma, metin üretimi, fotoğraf analizi
-- Masaüstü uygulaması (.deb + .exe)
-- Web arayüzü
+- Kod yazma, metin üretimi
+- Masaüstü uygulaması (PyQt6)
+- Web arayüzü (FastAPI)
 - CPU-optimized (GPU gerekmez)
 
-## Kurulum
+## Hızlı Kurulum
 
-### Arch Linux
-```bash
-git clone https://github.com/KULLANICI/FlakeAI.git
-cd FlakeAI
-chmod +x install-arch.sh
-./install-arch.sh
-```
+### Windows
+1. [FlakeAI-Setup.exe](https://github.com/tomar753ozi-sketch/FlakeAI-Agent/releases/download/v1.0/FlakeAI-Setup.exe) indir
+2. Çalıştır
+3. Kurulumu tamamla
 
 ### Debian/Ubuntu
 ```bash
 sudo dpkg -i flakeai_1.0_amd64.deb
+sudo apt-get install -f
 ```
 
-### Windows
-```
-FlakeAI-Setup.exe çalıştır
-```
-
-### Kaynaktan
+### Arch Linux
 ```bash
+git clone https://github.com/tomar753ozi-sketch/FlakeAI-Agent.git
+cd FlakeAI-Agent
+chmod +x install-arch.sh
+./install-arch.sh
+```
+
+### Kaynaktan (Tüm Platformlar)
+```bash
+git clone https://github.com/tomar753ozi-sketch/FlakeAI-Agent.git
+cd FlakeAI-Agent
 pip install -r requirements.txt
-python -m app.desktop.main
+python main.py --mode web
 ```
 
 ## Kullanım
 
 ### Terminal
 ```bash
-flakeai "Hello world"           # Metin üret
-flakeai --image photo.jpg       # Fotoğraf analiz
-flakeai --code "sorting"        # Kod yaz
+python main.py "Hello world"
+python main.py --mode chat
 ```
 
-### Web
+### Web Arayüzü
 ```bash
-python -m app.web.server
+python main.py --mode web
 # Tarayıcıda: http://localhost:8080
 ```
 
-### Masaüstü
+### Masaüstü Uygulaması
 ```bash
-flakeai-gui
+python main.py --mode gui
 ```
 
-## Eğitim
+### Eğitim
 ```bash
-python -m training.train --config configs/base.yaml
+python main.py --mode train --data data/
 ```
+
+## Gereksinimler
+- Python 3.10+
+- 8GB+ RAM
+- 1GB+ disk alanı
 
 ## Lisans
 MIT License
