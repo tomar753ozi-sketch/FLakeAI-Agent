@@ -10,70 +10,78 @@ NC='\033[0m'
 
 INSTALL_DIR="$HOME/.local/share/flakeai"
 BIN_DIR="$HOME/.local/bin"
-CONFIG_DIR="$HOME/.config/flakeai"
+VENV_DIR="$INSTALL_DIR/venv"
 
 log() { echo -e "${GREEN}[FlakeAI]${NC} $1"; }
 warn() { echo -e "${YELLOW}[UYARI]${NC} $1"; }
 err() { echo -e "${RED}[HATA]${NC} $1"; exit 1; }
 
-# Bağımlılıkları kur
 install_deps() {
     log "Bağımlılıklar kuruluyor..."
     
-    # Python kur (eğer yoksa)
-    if ! command -v python &> /dev/null; then
-        warn "Python kurulu değil, kuruluyor..."
-        sudo pacman -S --needed --noconfirm python python-pip
-    fi
+    # Sistem paketleri
+    sudo pacman -S --needed --noconfirm python python-pip git base-devel
     
-    # Python paketleri
-    pip install --user --upgrade pip
-    pip install --user torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-    pip install --user transformers datasets accelerate peft
-    pip install --user flask fastapi uvicorn
-    pip install --user pyqt6 pillow numpy tqdm pyyaml requests sentencepiece protobuf
+    # Virtual environment oluştur
+    log "Virtual environment oluşturuluyor..."
+    python -m venv "$VENV_DIR"
+    
+    # Paketleri venv'e kur
+    log "Python paketleri kuruluyor..."
+    source "$VENV_DIR/bin/activate"
+    
+    pip install --upgrade pip
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+    pip install transformers datasets accelerate peft
+    pip install flask fastapi uvicorn
+    pip install pyqt6 pillow numpy tqdm pyyaml requests sentencepiece protobuf
+    
+    deactivate
 }
 
-# FlakeAI'ı kur
 install_flakeai() {
     log "FlakeAI kuruluyor..."
     
     mkdir -p "$INSTALL_DIR"
     mkdir -p "$BIN_DIR"
-    mkdir -p "$CONFIG_DIR"
     
     # Dosyaları kopyala
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     cp -r "$SCRIPT_DIR"/* "$INSTALL_DIR/"
     
     # Ana komut
-    cat > "$BIN_DIR/flakeai" << 'EOF'
+    cat > "$BIN_DIR/flakeai" << EOF
 #!/bin/bash
-cd ~/.local/share/flakeai
-python main.py "$@"
+source "$VENV_DIR/bin/activate"
+cd "$INSTALL_DIR"
+python main.py "\$@"
+deactivate
 EOF
     chmod +x "$BIN_DIR/flakeai"
     
     # GUI komutu
-    cat > "$BIN_DIR/flakeai-gui" << 'EOF'
+    cat > "$BIN_DIR/flakeai-gui" << EOF
 #!/bin/bash
-cd ~/.local/share/flakeai
-python main.py --mode gui "$@"
+source "$VENV_DIR/bin/activate"
+cd "$INSTALL_DIR"
+python main.py --mode gui "\$@"
+deactivate
 EOF
     chmod +x "$BIN_DIR/flakeai-gui"
     
     # Web komutu
-    cat > "$BIN_DIR/flakeai-web" << 'EOF'
+    cat > "$BIN_DIR/flakeai-web" << EOF
 #!/bin/bash
-cd ~/.local/share/flakeai
-python main.py --mode web "$@"
+source "$VENV_DIR/bin/activate"
+cd "$INSTALL_DIR"
+python main.py --mode web "\$@"
+deactivate
 EOF
     chmod +x "$BIN_DIR/flakeai-web"
     
     log "Kurulum tamamlandı!"
 }
 
-# PATH'e ekle
 setup_path() {
     log "PATH ayarlanıyor..."
     
@@ -83,9 +91,10 @@ setup_path() {
     fi
 }
 
-# .desktop dosyası oluştur
 create_desktop_entry() {
     log "Desktop entry oluşturuluyor..."
+    
+    mkdir -p "$HOME/.local/share/applications"
     
     cat > "$HOME/.local/share/applications/flakeai.desktop" << EOF
 [Desktop Entry]
@@ -99,7 +108,6 @@ Categories=Development;AI;
 EOF
 }
 
-# Main
 main() {
     echo ""
     echo "═══════════════════════════════════════"
